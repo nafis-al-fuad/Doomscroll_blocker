@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doomscroll Blocker - Focus Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <!-- Options Page Lock Overlay (Typing Challenge) -->
+  <div id="lock-overlay" class="overlay hidden">
+    <div class="overlay-card lock-card">
+      <div class="lock-icon">
+        <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor">
+          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+        </svg>
+      </div>
+      <h2>Typing Challenge Required</h2>
+      <p class="challenge-desc">To access your blocker settings, type the phrase below exactly. Copy-paste is disabled to ensure mindful friction.</p>
+      
+      <div class="phrase-box">
+        <span id="target-phrase" class="phrase-text">Deep work produces results that matter to you.</span>
+      </div>
+
+      <input type="text" id="challenge-input" placeholder="Type the phrase here..." autocomplete="off" spellcheck="false">
+      
+      <div class="error-msg hidden" id="challenge-error">Phrases do not match yet. Double check spelling and punctuation.</div>
+
+      <button id="unlock-btn" disabled>Unlock Dashboard</button>
+    </div>
+  </div>
+
+  <!-- Master Switch Disable Countdown Overlay -->
+  <div id="countdown-overlay" class="overlay hidden">
+    <div class="overlay-card countdown-card">
+      <div class="warning-icon">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+      </div>
+      <h2>Deactivating Focus Mode</h2>
+      <p>Your configuration changes will unlock when the timer reaches zero.</p>
+      
+      <div id="countdown-timer">03:00</div>
+      
+      <p class="countdown-subtext">Take a deep breath. Are you sure you want to invite distraction back in?</p>
+
+      <div class="overlay-actions">
+        <button id="cancel-disable-btn" class="btn-secondary">Cancel & Keep Focus</button>
+        <button id="confirm-disable-btn" class="btn-danger" disabled>Confirm Disable</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Layout -->
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+          </svg>
+        </div>
+        <span class="brand-name">FocusBlock</span>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#targets" class="nav-item active" id="nav-targets">
+          <span class="nav-icon">🎯</span>
+          Active Targets
+        </a>
+        <a href="#analytics" class="nav-item" id="nav-analytics">
+          <span class="nav-icon">📊</span>
+          Analytics & Insights
+        </a>
+        <a href="#settings" class="nav-item" id="nav-settings">
+          <span class="nav-icon">🛡️</span>
+          Safeguards
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="master-control">
+          <div class="master-label-group">
+            <span class="master-title">Master Switch</span>
+            <span class="master-status" id="master-status-text">Active</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="master-switch" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content">
+      
+      <!-- Section: Active Targets -->
+      <section id="section-targets" class="content-section">
+        <div class="section-header">
+          <h1>Active Targets</h1>
+          <p>Granular controls for blocking short-form video triggers across desktop layouts.</p>
+        </div>
+
+        <div class="grid-layout">
+          <!-- YouTube Card -->
+          <div class="control-card">
+            <div class="card-header">
+              <div class="platform-logo yt-color">YT</div>
+              <div>
+                <h3>YouTube Shorts</h3>
+                <p>Customize YouTube desktop filters</p>
+              </div>
+            </div>
+            
+            <div class="control-group">
+              <div class="control-row">
+                <div>
+                  <span class="control-title">Block Mode</span>
+                  <span class="control-desc">Action when directly visiting /shorts/</span>
+                </div>
+                <select id="yt-block-mode" class="dropdown">
+                  <option value="camouflage">Camouflage ("Unavailable")</option>
+                  <option value="blackout">Blackout ("Blocked")</option>
+                  <option value="convert-watch">Convert to Standard Player</option>
+                  <option value="redirect">Redirect to Home Feed</option>
+                  <option value="disabled">Disabled</option>
+                </select>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="control-row">
+                <div>
+                  <span class="control-title">Strip Sidebar Buttons</span>
+                  <span class="control-desc">Remove Shorts menu options from guide lists</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="yt-sidebar-strip">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <div class="control-row">
+                <div>
+                  <span class="control-title">Nuke Grid Shelf</span>
+                  <span class="control-desc">Remove the horizontal Shorts row on the home feed</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="yt-grid-shelf-nuke">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <div class="control-row">
+                <div>
+                  <span class="control-title">Search Video Filtering</span>
+                  <span class="control-desc">Hide video results linking to Shorts</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="yt-search-filter">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <div class="control-row">
+                <div>
+                  <span class="control-title">Remove Channel Tab</span>
+                  <span class="control-desc">Hide Shorts tab on individual creator channels</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="yt-channel-tab-remove">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <div class="control-row">
+                <div>
+                  <span class="control-title">Hide Recommendations</span>
+                  <span class="control-desc">Remove Shorts recommendations on sidebar and end-screens</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="yt-recommendation-hide">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Facebook Card -->
+          <div class="control-card">
+            <div class="card-header">
+              <div class="platform-logo fb-color">FB</div>
+              <div>
+                <h3>Facebook Reels</h3>
+                <p>Customize Facebook desktop filters</p>
+              </div>
+            </div>
+            
+            <div class="control-group">
+              <div class="control-row">
+                <div>
+                  <span class="control-title">Skeleton Newsfeed Loaders</span>
+                  <span class="control-desc">Replace timeline Reels carousels with skeleton cards</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="fb-newsfeed-grid-filter">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <div class="control-row">
+                <div>
+                  <span class="control-title">Remove Left Sidebar Items</span>
+                  <span class="control-desc">Nuke Reels bookmarks in left side navigation panel</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="fb-left-bookmark-remove">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <div class="control-row">
+                <div>
+                  <span class="control-title">Purge Watch Tab Reels</span>
+                  <span class="control-desc">Strip Reels grids inside Facebook Watch hub</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="fb-watch-tab-purge">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Analytics -->
+      <section id="section-analytics" class="content-section hidden">
+        <div class="section-header">
+          <h1>Analytics & Insights</h1>
+          <p>Mindful calculations showing the focus you reclaimed during this browsing session.</p>
+        </div>
+
+        <div class="analytics-grid">
+          <!-- Statistics Widgets -->
+          <div class="stat-card">
+            <span class="stat-icon">🎯</span>
+            <div class="stat-value" id="stat-total-blocked">0</div>
+            <div class="stat-label">Triggers Avoided</div>
+            <p class="stat-desc">Distinct short-form elements, buttons, and carousels successfully scrubbed from view.</p>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-icon">⏳</span>
+            <div class="stat-value" id="stat-time-saved">0</div>
+            <div class="stat-label">Hours Reclaimed</div>
+            <p class="stat-desc">Calculated time saved from endless scrolling based on an average baseline of 45s per video.</p>
+          </div>
+
+          <!-- Mindful Card -->
+          <div class="control-card full-width">
+            <h3>Refocus Reminder</h3>
+            <p class="refocus-quote" id="refocus-quote-text">
+              "Focus is a muscle, and you build it by choosing what to ignore."
+            </p>
+            <div class="progress-container">
+              <div class="progress-bar-label">
+                <span>Daily Attention Reserve</span>
+                <span id="attention-percent">100%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 100%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Safeguards -->
+      <section id="section-settings" class="content-section hidden">
+        <div class="section-header">
+          <h1>Blocker Safeguards</h1>
+          <p>Administrative friction controls that protect you from changing your settings on impulse.</p>
+        </div>
+
+        <div class="control-card max-width-600">
+          <h3>Friction Gatekeeper</h3>
+          <p class="card-desc">Lock your Focus Dashboard settings by requiring a 6-8 word typing challenge before the options panel becomes editable.</p>
+          
+          <div class="control-group mt-20">
+            <div class="control-row">
+              <div>
+                <span class="control-title">Enable Typing Challenge Lock</span>
+                <span class="control-desc">Challenge triggers every time this dashboard opens</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="options-lock-enabled">
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <div class="control-row">
+              <div>
+                <span class="control-title">Hardware Lock: Keyboards</span>
+                <span class="control-desc">Disable arrows & Space on short players</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="lock-keyboard-scroll">
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <div class="control-row">
+              <div>
+                <span class="control-title">Hardware Lock: Scroll Wheels</span>
+                <span class="control-desc">Disable physical wheels & tracks on short videos</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="lock-mouse-wheel-scroll">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>
